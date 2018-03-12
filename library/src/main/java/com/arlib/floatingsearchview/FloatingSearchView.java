@@ -1898,6 +1898,24 @@ public class FloatingSearchView extends FrameLayout {
         }
     }
 
+    /**
+     * Hide all menu items
+     *
+     * @param withAnim
+     */
+    public void hideAllMenuItems(boolean withAnim) {
+        mMenuView.hideAllItems(withAnim);
+    }
+
+    /**
+     * Show all previously hidden menu items
+     *
+     * @param withAnim
+     */
+    public void showAllMenuItems(boolean withAnim) {
+        mMenuView.showIfRoomItems(withAnim);
+    }
+
     static class SavedState extends BaseSavedState {
 
         private List<? extends SearchSuggestion> suggestions = new ArrayList<>();

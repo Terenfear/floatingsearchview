@@ -337,7 +337,107 @@ public class MenuView extends LinearLayout {
         }
 
         //add anims for moving to right and/or zooming out previously shown items
-        for (int i = actionItemIndex; i < (diff + actionItemIndex); i++) {
+        for (int i = 0; i < (diff + actionItemIndex); i++) {
+
+            final View currentView = getChildAt(i);
+            currentView.setClickable(false);
+
+            //move to right
+            if (i != (getChildCount() - 1)) {
+                anims.add(ViewPropertyObjectAnimator.animate(currentView).setDuration(withAnim ? HIDE_IF_ROOM_ITEMS_ANIM_DURATION : 0)
+                        .addListener(new AnimatorListenerAdapter() {
+                            @Override
+                            public void onAnimationEnd(Animator animation) {
+
+                                currentView.setTranslationX(ACTION_DIMENSION_PX);
+                            }
+                        }).translationXBy(ACTION_DIMENSION_PX).get());
+            }
+
+            //scale and zoom out
+            anims.add(ViewPropertyObjectAnimator.animate(currentView)
+                    .setDuration(withAnim ? HIDE_IF_ROOM_ITEMS_ANIM_DURATION : 0)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+
+                            currentView.setScaleX(0.5f);
+                        }
+                    }).scaleX(.5f).get());
+            anims.add(ViewPropertyObjectAnimator.animate(currentView)
+                    .setDuration(withAnim ? HIDE_IF_ROOM_ITEMS_ANIM_DURATION : 0)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+
+                            currentView.setScaleY(0.5f);
+                        }
+                    }).scaleY(.5f).get());
+            anims.add(ViewPropertyObjectAnimator.animate(currentView)
+                    .setDuration(withAnim ? HIDE_IF_ROOM_ITEMS_ANIM_DURATION : 0)
+                    .addListener(new AnimatorListenerAdapter() {
+                        @Override
+                        public void onAnimationEnd(Animator animation) {
+
+                            currentView.setAlpha(0.0f);
+                        }
+                    }).alpha(0.0f).get());
+        }
+
+        final int actionItemsCount = actionItemIndex;
+
+        //finally, run animation
+        if (!anims.isEmpty()) {
+
+            AnimatorSet animSet = new AnimatorSet();
+            if (!withAnim) {
+                //temporary, from laziness
+                animSet.setDuration(0);
+            }
+            animSet.playTogether(anims.toArray(new ObjectAnimator[anims.size()]));
+            animSet.addListener(new AnimatorListenerAdapter() {
+                @Override
+                public void onAnimationEnd(Animator animation) {
+
+                    if (mOnVisibleWidthChangedListener != null) {
+                        mVisibleWidth = ((int) ACTION_DIMENSION_PX * actionItemsCount);
+                        mOnVisibleWidthChangedListener.onItemsMenuVisibleWidthChanged(mVisibleWidth);
+                    }
+                }
+            });
+            animSet.start();
+        }
+    }
+
+    /**
+     * Hides all the menu items
+     *
+     * @param withAnim
+     */
+    public void hideAllItems(boolean withAnim) {
+
+        if (mMenu == -1) {
+            return;
+        }
+
+        mActionShowAlwaysItems.clear();
+        cancelChildAnimListAndClear();
+
+        List<MenuItemImpl> showAlwaysActionItems = filter(mMenuItems, new MenuItemImplPredicate() {
+            @Override
+            public boolean apply(MenuItemImpl menuItem) {
+                return  menuItem.getIcon() != null && menuItem.requiresActionButton();
+            }
+        });
+
+        int actionItemIndex = Math.min(mActionItems.size(), showAlwaysActionItems.size());
+
+        final int diff = mActionItems.size() - actionItemIndex + (mHasOverflow ? 1 : 0);
+
+        anims = new ArrayList<>();
+
+        //add anims for moving to right and/or zooming out previously shown items
+        for (int i = 0; i < (diff + actionItemIndex); i++) {
 
             final View currentView = getChildAt(i);
             currentView.setClickable(false);
