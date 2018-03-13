@@ -10,6 +10,10 @@ buildscript {
 
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'maven-publish'
+
+group='com.github.Terenfear'
 
 android {
     compileSdkVersion 27
@@ -27,8 +31,8 @@ android {
 }
 
 dependencies {
-    compile project(path: ':library-rxbinding')
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    api project(path: ':library-rxbinding')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
 
 sourceCompatibility = "1.7"
